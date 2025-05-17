@@ -13,31 +13,44 @@ import java.net.URISyntaxException;
 @Configuration
 public class DatabaseConfig {
 
-    @Value("${DATABASE_URL:#{null}}")
+    @Value("${JDBC_DATABASE_URL:#{null}}")
     private String databaseUrl;
 
     @Bean
     @Primary
     public DataSource dataSource() {
-        // If standard JDBC URL is provided through JDBC_DATABASE_URL,
-        // Spring Boot will handle it with default properties automatically
-
-        // This code only runs when using Render's DATABASE_URL format
-        if (databaseUrl != null && databaseUrl.startsWith("postgres://")) {
+        // Handle standard JDBC URL or convert postgresql:// format
+        if (databaseUrl != null && databaseUrl.startsWith("postgresql://")) {
             try {
+                // Parse the URL properly
                 URI dbUri = new URI(databaseUrl);
 
-                String username = dbUri.getUserInfo().split(":")[0];
-                String password = dbUri.getUserInfo().split(":")[1];
-                String jdbcUrl = "jdbc:postgresql://" + dbUri.getHost() + ":" + dbUri.getPort() + dbUri.getPath();
+                // Get username and password from the URI userInfo
+                String userInfo = dbUri.getUserInfo();
+                String username = null;
+                String password = null;
 
+                if (userInfo != null && userInfo.contains(":")) {
+                    String[] parts = userInfo.split(":");
+                    username = parts[0];
+                    password = parts[1];
+                }
+
+                // Create the proper JDBC URL
+                String jdbcUrl = "jdbc:postgresql://" + dbUri.getHost();
+                if (dbUri.getPort() > 0) {
+                    jdbcUrl += ":" + dbUri.getPort();
+                }
+                jdbcUrl += dbUri.getPath();
+
+                // Build and return the DataSource
                 return DataSourceBuilder.create()
                         .url(jdbcUrl)
                         .username(username)
                         .password(password)
                         .build();
             } catch (URISyntaxException e) {
-                throw new RuntimeException("Invalid DATABASE_URL", e);
+                throw new RuntimeException("Invalid JDBC_DATABASE_URL", e);
             }
         }
 
