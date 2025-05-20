@@ -41,6 +41,6 @@ public class PlantController {
 
     @GetMapping("/random")
     public List<Plant> getRandomPlants() {
-        return plantService.getRandomPlants(5);
+        return plantService.getRandomPlants(8);
     }
 }
