@@ -31,12 +31,13 @@ public class PlantService {
             List<Plant> plants = new ArrayList<>();
 
             while ((data = csvReader.readNext()) != null) {
-                if (data.length >= 4) {
+                if (data.length >= 5) {
                     Plant plant = new Plant();
                     plant.setPlantName(data[0].trim());
                     plant.setPartUsed(data[1].trim());
-                    plant.setMedicinalBenefits(data[2].trim());
-                    plant.setImageUrl(data[3].trim());
+                    plant.setRegion(data[2].trim());       // Region is at index 2
+                    plant.setMedicinalBenefits(data[3].trim());  // MedicinalBenefits is at index 3
+                    plant.setImageUrl(data[4].trim());     // ImageUrl is at index 4
                     plants.add(plant);
                 }
             }
