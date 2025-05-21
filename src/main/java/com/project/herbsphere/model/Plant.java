@@ -24,5 +24,8 @@ public class Plant {
     @Column(columnDefinition = "TEXT")
     private String medicinalBenefits;
 
+    private String Region;
+
     private String imageUrl;
+
 }
